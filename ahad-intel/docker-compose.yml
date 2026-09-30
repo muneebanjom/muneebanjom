@@ -1,0 +1,59 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ahad_intel
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d ahad_intel']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - '5432:5432'
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@db:5432/ahad_intel?schema=public
+      APP_URL: ${APP_URL:-http://localhost:3000}
+      AUTH_SECRET: ${AUTH_SECRET:?AUTH_SECRET must be set}
+      APP_ENCRYPTION_KEY: ${APP_ENCRYPTION_KEY:?APP_ENCRYPTION_KEY must be set}
+      CRON_SECRET: ${CRON_SECRET:-}
+      AI_PROVIDER: ${AI_PROVIDER:-heuristic}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      AI_MODEL: ${AI_MODEL:-claude-sonnet-5-5}
+      NODE_ENV: production
+    ports:
+      - '3000:3000'
+
+  # Background worker: daily feeds, rescoring, enrichment, retention sweeps.
+  # Built from the `build` stage, which still carries the sources and tsx that
+  # the worker entry point needs (the runtime stage is a slim standalone bundle).
+  worker:
+    build:
+      context: .
+      target: build
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@db:5432/ahad_intel?schema=public
+      AUTH_SECRET: ${AUTH_SECRET:?AUTH_SECRET must be set}
+      APP_ENCRYPTION_KEY: ${APP_ENCRYPTION_KEY:?APP_ENCRYPTION_KEY must be set}
+      AI_PROVIDER: ${AI_PROVIDER:-heuristic}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      NODE_ENV: production
+    command: ['npx', 'tsx', 'src/jobs/worker.ts']
+
+volumes:
+  pgdata:

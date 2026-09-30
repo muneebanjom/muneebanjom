@@ -1,0 +1,135 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+    --bg: 248 250 252;
+    --surface: 255 255 255;
+    --surface-2: 248 250 252;
+    --line: 226 232 240;
+    --ink: 15 23 42;
+    --muted: 100 116 139;
+    --brand: 11 95 255;
+    --brand-ink: 255 255 255;
+    --ok: 22 163 74;
+    --warn: 217 119 6;
+    --danger: 220 38 38;
+    --info: 2 132 199;
+
+    /* Chart surface + validated categorical palette (light steps). */
+    --viz-surface: #ffffff;
+    --viz-grid: #e2e8f0;
+    --viz-text: #0f172a;
+    --viz-text-muted: #64748b;
+    --series-1: #2a78d6;
+    --series-2: #eb6834;
+    --series-3: #1baf7a;
+    --series-4: #eda100;
+    --series-5: #e87ba4;
+    --series-6: #008300;
+    --viz-sequential: #2a78d6;
+  }
+
+  :root[data-theme='dark'],
+  :root:not([data-theme='light']) {
+    /* Dark steps are selected for the dark surface, not flipped. */
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      color-scheme: dark;
+      --bg: 9 13 22;
+      --surface: 17 24 39;
+      --surface-2: 24 32 48;
+      --line: 42 54 74;
+      --ink: 241 245 249;
+      --muted: 148 163 184;
+      --brand: 96 158 255;
+      --brand-ink: 6 12 24;
+      --ok: 74 222 128;
+      --warn: 251 191 36;
+      --danger: 248 113 113;
+      --info: 56 189 248;
+
+      --viz-surface: #111827;
+      --viz-grid: #2a364a;
+      --viz-text: #f1f5f9;
+      --viz-text-muted: #94a3b8;
+      --series-1: #3987e5;
+      --series-2: #d95926;
+      --series-3: #199e70;
+      --series-4: #c98500;
+      --series-5: #d55181;
+      --series-6: #008300;
+      --viz-sequential: #3987e5;
+    }
+  }
+
+  :root[data-theme='dark'] {
+    color-scheme: dark;
+    --bg: 9 13 22;
+    --surface: 17 24 39;
+    --surface-2: 24 32 48;
+    --line: 42 54 74;
+    --ink: 241 245 249;
+    --muted: 148 163 184;
+    --brand: 96 158 255;
+    --brand-ink: 6 12 24;
+    --ok: 74 222 128;
+    --warn: 251 191 36;
+    --danger: 248 113 113;
+    --info: 56 189 248;
+
+    --viz-surface: #111827;
+    --viz-grid: #2a364a;
+    --viz-text: #f1f5f9;
+    --viz-text-muted: #94a3b8;
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --series-4: #c98500;
+    --series-5: #d55181;
+    --series-6: #008300;
+    --viz-sequential: #3987e5;
+  }
+
+  * {
+    border-color: rgb(var(--line));
+  }
+
+  body {
+    background-color: rgb(var(--bg));
+    color: rgb(var(--ink));
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background-color: rgb(var(--brand) / 0.2);
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-line bg-surface shadow-card;
+  }
+
+  .label {
+    @apply text-xs font-medium uppercase tracking-wide text-muted;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-line bg-surface px-3 py-2 text-sm text-ink
+           outline-none transition placeholder:text-muted/70
+           focus:border-brand focus:ring-2 focus:ring-brand/20;
+  }
+
+  .focus-ring {
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 focus-visible:ring-offset-bg;
+  }
+
+  .scroll-thin {
+    scrollbar-width: thin;
+  }
+}
